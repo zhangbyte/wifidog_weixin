@@ -5,6 +5,13 @@
         <title>wifi验证成功</title>
     </head>
     <body>
-        <h1>验证通过，您可以正常上网啦！</h1>
+        <h1>验证通过，您可以正常上网啦！3秒后自动跳转到多火工作室官网。。。。。。</h1>
+        <script type="text/javascript">
+            window.onload = function(){
+                setTimeout(function(){
+                    location.href="http://www.duohuo.org/";
+                },3000);
+            }
+        </script>
     </body>
 </html>

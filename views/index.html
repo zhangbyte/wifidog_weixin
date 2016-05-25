@@ -2,9 +2,29 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>wifi验证页面</title>
+        <title>多火免费wifi</title>
+        <script src="js/jquery-1.12.0.min.js"></script>
+        <script src="js/responsiveslides.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
-        <h1>您好，该wifi仅免费提供给关注我们微信公众号的小伙伴使用！</h1>
+        <ul class="rslides">
+          <li><img src="img/banner.jpg" alt=""></li>
+          <li><img src="img/banner2.jpg" alt=""></li>
+          <li><img src="img/banner3.jpg" alt=""></li>
+          <li><img src="img/banner4.jpg" alt=""></li>
+        </ul>
+        <h1 style="font-size: 50px;text-align: center;">如何上网：</h1>
+        <p style="font-size: 30px;">扫描下方二维码，关注多火工作室的公众号，回复“免费wifi”，点击收到的链接即可免费上网啦～</p>
+        <div style="width:430px;margin:0 auto;">
+            <img src="img/pic.jpg" alt="">
+        </div>
+        <script type="text/javascript">
+              $(function() {
+                $(".rslides").responsiveSlides({
+                    speed: 800
+                });
+              });
+        </script>
     </body>
 </html>
