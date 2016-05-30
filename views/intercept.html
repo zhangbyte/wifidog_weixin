@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head lang="zh-CN">
+<meta charset="UTF-8">
+    <title>微信连Wi-Fi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no"> 
+    <script type="text/javascript" >
+    /*    微信连Wi-Fi协议3.1供运营商portal呼起微信浏览器使用
+        ----开发认证流程所需参数----
+            门店名称 : 大学生活动中心
+            ssid : free
+            shopId : 5769896
+            appId : wxcbb0bc12953e0a26
+            secretKey : 7fa2e3ec844a68940bcba36717d19a93
+        ----复用demo代码说明----
+            若认证Portal页直接使用此Demo源代码，请注意填写代码中的以下参数（由您的网络环境动态获取）：
+            extend
+            timestamp
+            authUrl
+            mac
+            bssid
+            sign
+            其中sign签名请在后台完成，例如：
+            var toSign = appId + extend + timestamp + shopId + authUrl + mac + ssid + bssid + secretKey;
+            var sign= md5(toSign);
+        ----参考文档----
+            http://mp.weixin.qq.com/wiki/10/0ef643c7147fdf689e0a780d8c08ab96.html
+      */  
+        var loadIframe = null;
+        var noResponse = null;
+        var callUpTimestamp = 0;
+         
+        function putNoResponse(ev){
+             clearTimeout(noResponse);
+        }   
+        
+         function errorJump()
+         {
+             var now = new Date().getTime();
+             if((now - callUpTimestamp) > 4*1000){
+                 return;
+             }
+             alert('该浏览器不支持自动跳转微信请手动打开微信\n如果已跳转请忽略此提示');
+         }
+         
+         myHandler = function(error) {
+             errorJump();
+         };
+         
+         function createIframe(){
+             var iframe = document.createElement("iframe");
+             iframe.style.cssText = "display:none;width:0px;height:0px;";
+             document.body.appendChild(iframe);
+             loadIframe = iframe;
+         }
+        //注册回调函数
+        function jsonpCallback(result){  
+            if(result && result.success){
+                //alert('WeChat will call up : ' + result.success + '  data:' + result.data);             
+                var ua=navigator.userAgent;              
+                if (ua.indexOf("iPhone") != -1 ||ua.indexOf("iPod")!=-1||ua.indexOf("iPad") != -1) {   //iPhone             
+                    document.location = result.data;
+                }else{          
+                    createIframe();
+                    callUpTimestamp = new Date().getTime();
+                    loadIframe.src=result.data;
+                    noResponse = setTimeout(function(){
+                        errorJump();
+                    },3000);
+                }               
+            }else if(result && !result.success){
+                //alert(result.data);
+            }
+        }
+        function Wechat_GotoRedirect(appId, extend, timestamp, sign, shopId, authUrl, mac, ssid, bssid){
+            //将回调函数名称带到服务器端
+            var url = "https://wifi.weixin.qq.com/operator/callWechatBrowser.xhtml?appId=" + appId 
+                                + "&extend=" + extend 
+                                + "&timestamp=" + timestamp 
+                                + "&sign=" + sign;  
+            
+            //如果sign后面的参数有值，则是新3.1发起的流程
+            if(authUrl && shopId){
+                url = "https://wifi.weixin.qq.com/operator/callWechat.xhtml?appId=" + appId 
+                                + "&extend=" + extend 
+                                + "&timestamp=" + timestamp 
+                                + "&sign=" + sign
+                                + "&shopId=" + shopId
+                                + "&authUrl=" + encodeURIComponent(authUrl)
+                                + "&mac=" + mac
+                                + "&ssid=" + ssid
+                                + "&bssid=" + bssid;
+                
+            }           
+            //临时放行
+            var weixinurl = "http://115.159.4.83:8080/tmp_pass?mac="+mac;
+            var script1 = document.createElement('script');  
+            script1.setAttribute('src', weixinurl);  
+            document.getElementsByTagName('head')[0].appendChild(script1);
+
+            //通过dom操作创建script节点实现异步请求  
+            var script = document.createElement('script');  
+            script.setAttribute('src', url);  
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+
+    </script>
+    
+<script type="text/javascript" src="js/md5.js"></script>
+ 
+<link rel="stylesheet" href="/css/style-simple-follow.css"/>
+</head>
+<body class="mod-simple-follow">
+<div class="mod-simple-follow-page">
+    <div class="mod-simple-follow-page__banner">
+        <img class="mod-simple-follow-page__banner-bg" src="/img/background.jpg" alt=""/>
+        <div class="mod-simple-follow-page__img-shadow"></div>
+        <div class="mod-simple-follow-page__logo">
+            <img class="mod-simple-follow-page__logo-img" src="/img/t.weixin.logo.png" alt=""/>
+            <p class="mod-simple-follow-page__logo-name"></p>
+            <p class="mod-simple-follow-page__logo-welcome">欢迎您</p>
+        </div>
+    </div>
+    <div class="mod-simple-follow-page__attention">
+        <p class="mod-simple-follow-page__attention-txt">欢迎使用微信连Wi-Fi</p>
+        <a class="mod-simple-follow-page__attention-btn" onclick="callWechatBrowser()">一键打开微信连Wi-Fi</a>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    var appId          = "wxcbb0bc12953e0a26";
+    var secretkey      = "7fa2e3ec844a68940bcba36717d19a93";
+    var extend         = "duohuo";    　　　 //开发者自定义参数集合
+    var timestamp      = new Date().getTime();　　　　//时间戳(毫秒)
+    var shop_id        = "5769896";            　　  //AP设备所在门店的ID
+    var authUrl        = "http://115.159.4.83:8080/weixinAuth?httpCode=200";        //认证服务端URL
+    var mac            = "<%=mac %>";  　　　//用户手机mac地址 安卓设备必需
+    var ssid           = "free";           //AP设备信号名称，非必须
+    var bssid          = "";       //AP设备mac地址，非必须
+
+    //向authUrl传入mac信息
+    authUrl = authUrl + "&mac=" + mac;
+
+    function callWechatBrowser(){
+        var sign = hex_md5(appId + extend + timestamp + shop_id + authUrl + mac + ssid + bssid + secretkey);
+        Wechat_GotoRedirect(appId, extend, timestamp, sign, shop_id, authUrl, mac, ssid, bssid);
+    }
+</script>
+
+<script type="text/javascript">
+    document.addEventListener('visibilitychange', putNoResponse, false);
+</script>
+
+
+</html>
+    
+    
